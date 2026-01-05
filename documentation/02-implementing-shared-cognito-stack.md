@@ -5,7 +5,7 @@ Why do this?:
 - therefore, no need to create new user pools for each new application that you create
 - especially helpful when using one shared stack for an enterprise that wants the same set of users using their different applications
     - for example, UST creates a bunch of staff-only websites. It would be complicated to set up a new user pool (which basically says only staff are allowed to log in)
-    - instead, create a shared user pool, where only staff are allowed to authenticate, but use this single user pool for all the different 
+    - instead, create a shared user pool, where only staff are allowed to authenticate, but use this single user pool for all the different web apps
     - Also, to register a single user pool with ADFS SSO requires exchanging metadata urls (basically, information about your user pool) with the Microsoft Security people. Doing this once is ideal. Imagine creating a new ticket each time to create the same functionality you requested before 🤯.
 
 
@@ -26,3 +26,17 @@ What are these two options (pick your poison type situation):
     - but, if the token says the user is a "student", then the frontend says you're not allowed to use the app -> not authenticated
     - Pros: Not requesting tickets for every different type of user group
     - Cons: Validation logic needs to be added to the frontend to check the user's permission level as specified in the auth token
+
+# Step-By-Step Creating a Shared Cognito Stack: (todo expand on each step in detail)
+1. clone the repo and all that jazz just to get set up and everything
+2. Initial Infrastructure Deployment to get required outputs to give to the security people (do with EnableADFS false)
+3. gather outputs and all that jazz
+    - entity id, that urn:amazon:cognito string
+    - reply url: https://<Your-UserPoolDomain>.auth.<region>.amazoncognito.com/saml2/idpresponse
+4. give ts to security people
+5. They will give to you ts:
+    - Metadata url
+    - Info related to attribute mapping (if they don't, assume it's AttributeMapping:
+        email: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+        name: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")
+6. Do EnableADFS True
