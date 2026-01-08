@@ -4,6 +4,6 @@ AWS provides a managed solution, Amazon Cognito, for implementing authentication
 
 # Table of Contents:
 
-1. Auth Types
-2. Implementing a shared cognito stack for ADFS SSO
+1. [Auth Types](./01-auth-types.md)
+2. [Implementing a shared cognito stack](./02-implementing-shared-cognito-stack.md)
 3. Using the shared cognito stack (created in #2) for ADFS SSO
