@@ -1,5 +1,7 @@
 # Authentication Types:
 
+If you're looking at this documentation, you are likely only concerned with Type #3, so jump there.
+
 ### 1. Email Loop 
 
 - users can use their email addresses in order to sign up/sign into web applications
@@ -53,4 +55,5 @@
 - - Step 1: create basic cognito resources via an IaC template. Deploying this IaC will give you the credentials required to set up Entra on Entra Admin's side.
   - Step 2: Pass the credentials to an Entra Admin. They will give you the following information: app federation metadata url, login url, microsoft entra identifier, logout url
   - Step 3: Plug in the information received from the Entra Admin in the appropriate places in the IaC CloudFormation Template.
-- A step-by-step process is laid out [here](./02-implementing-shared-cognito-stack.md).
+  - A step-by-step process is laid out [here](./02-implementing-shared-cognito-stack.md).
+- Now use this authentication stack that you deployed in any web app (integration with a react frontend is given   [here](https://github.com/UniversityOfSaintThomas/aws-cognito-docs/blob/main/documentation/03-frontend-implementation.md)
