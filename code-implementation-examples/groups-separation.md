@@ -6,7 +6,42 @@ When you need to separate different types of users (e.g., Staff vs. Students, or
 
 Use one User Pool for everyone, but sort users into **Cognito Groups**.
 
-**Table of Contents: Separation of Groups (What to add)**
+#### Template.yml
+
+**Add Domain in Application Parameters**
+
+In `application-infrastructure/template.yml` , under `Metadata:`> ... > `Label:`> `default: "Application Parameters"` add the following parameter:
+```yaml
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      #...
+      - 
+        Label:
+          default: "Application Parameters"
+        Parameters:
+          #... 
+          # ADD THIS ONE VVV
+          - Domain # May need to refactor
+```
+
+**Add Domain in Parameters**
+
+In `application-infrastructure/template.yml` , under `Parameters:` add the following code:
+
+**NOTE: This `Parameters:` section defines the actual parameter properties. This section is different from the `Metadata` > ... > `Parameters:` section above.**
+```yaml
+Parameters:
+  #...
+  Domain:
+    Type: String
+    Description: "Custom domain name to primarily use for the CallbackURLs. If you leave this blank, a default localhost domain will be used."
+    Default: "http://localhost:3000"
+    AllowedPattern: "^$|^https?://[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*(:[0-9]{1,5})?(/.*)?$"
+    ConstraintDescription: "A valid URL (http/https) or empty string"
+```
+
+**Table of Contents: Resources (What to add)**
 - **1a.** User Pool and "Post Confirmation" Trigger
 - **1b.** Admins Group
 - **1c.** General Users Group
@@ -21,39 +56,39 @@ Use one User Pool for everyone, but sort users into **Cognito Groups**.
 In `application-infrastructure/template.yml` , under `Resources:` add the following code:
 ```yaml
 Resources:
-	# ---------------------------------------------------------------------------
-	# Separation of Groups
-	
-	# 1a. Create the User Pool (standard)
-	CognitoUsers:
-	  Type: AWS::Cognito::UserPool
-	  DeletionPolicy: Retain
-	  UpdateReplacePolicy: Retain
-	  Properties: 
-	    UserPoolName: !Sub "${Prefix}-${ProjectId}-${StageId}-UserPool"
-	    LambdaConfig:
-	      PostConfirmation: !GetAtt AssignGroupFunction.Arn
-	
-	# 1b. Define the 'Admins' Group
-	AdminGroup:
-	 Type: AWS::Cognito::UserPoolGroup
-	 Properties:
-		 GroupName: "Admins"
-		 UserPoolId: !Ref CognitoUsers
-		 Description: "University Staff and IT Admins"
-		 Precedence: 0 # Higher precedence overrides lower ones if IAM roles conflict
-	
-	# 1c. Define the 'GeneralUsers' Group
-	GeneralGroup:
-	 Type: AWS::Cognito::UserPoolGroup
-	 Properties:
-		 GroupName: "GeneralUsers"
-		 UserPoolId: !Ref CognitoUsers
-		 Description: "Standard Student Access"
+    # ---------------------------------------------------------------------------
+    # Separation of Groups
+    
+    # 1a. Create the User Pool (standard)
+    CognitoUsers:
+      Type: AWS::Cognito::UserPool
+      DeletionPolicy: Retain
+      UpdateReplacePolicy: Retain
+      Properties: 
+        UserPoolName: !Sub "${Prefix}-${ProjectId}-${StageId}-UserPool"
+        LambdaConfig:
+          PostConfirmation: !GetAtt AssignGroupFunction.Arn
+    
+    # 1b. Define the 'Admins' Group
+    AdminGroup:
+     Type: AWS::Cognito::UserPoolGroup
+     Properties:
+         GroupName: "Admins"
+         UserPoolId: !Ref CognitoUsers
+         Description: "University Staff and IT Admins"
+         Precedence: 0 # Higher precedence overrides lower ones if IAM roles conflict
+    
+    # 1c. Define the 'GeneralUsers' Group
+    GeneralGroup:
+     Type: AWS::Cognito::UserPoolGroup
+     Properties:
+         GroupName: "GeneralUsers"
+         UserPoolId: !Ref CognitoUsers
+         Description: "Standard Student Access"
 
-	# 1d. Define the more groups as needed (This Documentation will only use Admin and GeneralUsers)
-	
-	# 2a. DynamoDB Table storing the list of Admin emails
+    # 1d. Define the more groups as needed (This Documentation will only use Admin and GeneralUsers)
+    
+    # 2a. DynamoDB Table storing the list of Admin emails
   AdminWhitelistTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -75,8 +110,8 @@ Resources:
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-	    RoleName: !Sub "${Prefix}-${ProjectId}-${StageId}-LambdaExecRole"
-	    Description: "IAM Role that allows the Lambda permission to execute and access resources"
+        RoleName: !Sub "${Prefix}-${ProjectId}-${StageId}-LambdaExecRole"
+        Description: "IAM Role that allows the Lambda permission to execute and access resources"
       Path: !Ref RolePath
       PermissionsBoundary: !If [HasPermissionsBoundaryArn, !Ref PermissionsBoundaryArn, !Ref 'AWS::NoValue' ]
       AssumeRolePolicyDocument:
@@ -84,127 +119,127 @@ Resources:
         Statement:
           - Effect: Allow
             Principal: 
-	            Service: [ 'lambda.amazonaws.com' ]
+                Service: [ 'lambda.amazonaws.com' ]
             Action: sts:AssumeRole
       # These are the resources your Lambda function needs access to Logs, SSM Parameters, DynamoDb, S3, etc.
       # Define specific actions such as get/put (read/write). Work towards practicing the Principle of Least Privilege
       Policies:
-			- PolicyName: !Sub "${Prefix}-${ProjectId}-${StageId}-ExecutionPolicy"
-				PolicyDocument:
-			    Statement:
-			    
-	          - Sid: LambdaAccessToWriteLogs
-		            Action:
-		            - logs:CreateLogGroup
-		            - logs:CreateLogStream
-		            - logs:PutLogEvents
-		            Effect: Allow
-		            Resource: !GetAtt AppLogGroup.Arn
+            - PolicyName: !Sub "${Prefix}-${ProjectId}-${StageId}-ExecutionPolicy"
+                PolicyDocument:
+                Statement:
+                
+              - Sid: LambdaAccessToWriteLogs
+                    Action:
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                    Effect: Allow
+                    Resource: !GetAtt AppLogGroup.Arn
             
             - Sid: DynamoDBReadAdminWhitelist
-	            Effect: Allow
-	            Action: ['dynamodb:GetItem']
-	            Resource: !GetAtt AdminWhitelistTable.Arn
+                Effect: Allow
+                Action: ['dynamodb:GetItem']
+                Resource: !GetAtt AdminWhitelistTable.Arn
             
             - Sid: CognitoAssignGroup
-	            Effect: Allow
-	            Action: ['cognito-idp:AdminAddUserToGroup']
-	            Resource: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*'
-	            # The * above matches all user pools in this account/region. The condition below
-	            # restricts access to only the user pool tagged with this deployment's ApplicationDeploymentId,
-	            # preventing this Lambda from acting on unrelated user pools.
-	            Condition:
-	              StringEquals:
-	                "aws:ResourceTag/atlantis:ApplicationDeploymentId": !Sub "${Prefix}-${ProjectId}-${StageId}"
-		
-		# 2c. The Lambda Function that does the sorting
-	  AssignGroupFunction:
-	    Type: AWS::Lambda::Function
-	    Properties:
-	      FunctionName: !Sub '${Prefix}-${ProjectId}-${StageId}-AssignGroupFunction'
-	      Runtime: nodejs24.x
-	      Handler: index.handler
-	      Role: !GetAtt LambdaExecutionRole.Arn
-	      Environment:
-	        Variables:
-	          ADMIN_TABLE_NAME: !Ref AdminWhitelistTable
-	      Code:
-	        ZipFile: |
-	          const { CognitoIdentityProviderClient, AdminAddUserToGroupCommand } = require("@aws-sdk/client-cognito-identity-provider");
-	          const { DynamoDBClient, GetItemCommand } = require("@aws-sdk/client-dynamodb");
-	          const cognitoClient = new CognitoIdentityProviderClient();
-	          const ddbClient = new DynamoDBClient();
-	          exports.handler = async (event) => {
-	            const email = event.request.userAttributes.email;
-	            const userPoolId = event.userPoolId;
-	            const username = event.userName;
-	            let targetGroup = "GeneralUsers";
-	            try {
-	              const ddbResponse = await ddbClient.send(new GetItemCommand({
-	                TableName: process.env.ADMIN_TABLE_NAME,
-	                Key: { email: { S: email } }
-	              }));
-	              if (ddbResponse.Item) targetGroup = "Admins";
-	              await cognitoClient.send(new AdminAddUserToGroupCommand({
-	                GroupName: targetGroup,
-	                UserPoolId: userPoolId,
-	                Username: username,
-	              }));
-	              console.log(`Assigned ${email} to ${targetGroup}`);
-	            } catch (err) {
-	              console.error("Error assigning group:", err);
-	            }
-	            return event;
-	          };
-	
-		# 2d. Permission for Cognito to invoke AssignGroupFunction
-	  CognitoLambdaInvokePermission:
-	    Type: AWS::Lambda::Permission
-	    Properties:
-	      Action: lambda:InvokeFunction
-	      FunctionName: !Ref AssignGroupFunction
-	      Principal: cognito-idp.amazonaws.com
-	      SourceArn: !GetAtt CognitoUsers.Arn
-	   
-		
-	  # 3a. Cognito App Client: OAuth2 client for the frontend to authenticate users via the hosted login UI
-	  #     Uses Authorization Code flow (no client secret) with openid/email/profile scopes
-	  CognitoAppClient:
-	    Type: AWS::Cognito::UserPoolClient
-	    Properties:
-	      ClientName: !Sub "${Prefix}-${ProjectId}-${StageId}-AppClient"
-	      UserPoolId: !Ref CognitoUsers
-	      GenerateSecret: false
-	      AllowedOAuthFlowsUserPoolClient: true
-	      AllowedOAuthFlows:
-	        - code
-	      AllowedOAuthScopes:
-	        - openid
-	        - email
-	        - profile
-	      SupportedIdentityProviders:
-	        - COGNITO
-	      CallbackURLs:
-	        - http://localhost:3000/callback
-	      LogoutURLs:
-	        - http://localhost:3000/
-	 
-	# 3b. Cognito Hosted UI Domain (Classic):
-	#     provides a managed login/logout UI at <Prefix>-<ProjectId>.auth.<region>.amazoncognito.com
-	CognitoUserPoolDomain:
-		Type: AWS::Cognito::UserPoolDomain
-		Properties:
-		  Domain: !Sub "${Prefix}-${ProjectId}"
-		  UserPoolId: !Ref CognitoUsers
-		  ManagedLoginVersion: 1
-	        
-	#Rest of the code down here vvv (dont copy this or anything below this point)
-	# ---------------------------------------------------------------------------
-	# API Gateway Resources
-	
-	# -- API Gateway --
-	#WebApi:
-	#	.........
+                Effect: Allow
+                Action: ['cognito-idp:AdminAddUserToGroup']
+                Resource: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*'
+                # The * above matches all user pools in this account/region. The condition below
+                # restricts access to only the user pool tagged with this deployment's ApplicationDeploymentId,
+                # preventing this Lambda from acting on unrelated user pools.
+                Condition:
+                  StringEquals:
+                    "aws:ResourceTag/atlantis:ApplicationDeploymentId": !Sub "${Prefix}-${ProjectId}-${StageId}"
+        
+        # 2c. The Lambda Function that does the sorting
+      AssignGroupFunction:
+        Type: AWS::Lambda::Function
+        Properties:
+          FunctionName: !Sub '${Prefix}-${ProjectId}-${StageId}-AssignGroupFunction'
+          Runtime: nodejs24.x
+          Handler: index.handler
+          Role: !GetAtt LambdaExecutionRole.Arn
+          Environment:
+            Variables:
+              ADMIN_TABLE_NAME: !Ref AdminWhitelistTable
+          Code:
+            ZipFile: |
+              const { CognitoIdentityProviderClient, AdminAddUserToGroupCommand } = require("@aws-sdk/client-cognito-identity-provider");
+              const { DynamoDBClient, GetItemCommand } = require("@aws-sdk/client-dynamodb");
+              const cognitoClient = new CognitoIdentityProviderClient();
+              const ddbClient = new DynamoDBClient();
+              exports.handler = async (event) => {
+                const email = event.request.userAttributes.email;
+                const userPoolId = event.userPoolId;
+                const username = event.userName;
+                let targetGroup = "GeneralUsers";
+                try {
+                  const ddbResponse = await ddbClient.send(new GetItemCommand({
+                    TableName: process.env.ADMIN_TABLE_NAME,
+                    Key: { email: { S: email } }
+                  }));
+                  if (ddbResponse.Item) targetGroup = "Admins";
+                  await cognitoClient.send(new AdminAddUserToGroupCommand({
+                    GroupName: targetGroup,
+                    UserPoolId: userPoolId,
+                    Username: username,
+                  }));
+                  console.log(`Assigned ${email} to ${targetGroup}`);
+                } catch (err) {
+                  console.error("Error assigning group:", err);
+                }
+                return event;
+              };
+    
+        # 2d. Permission for Cognito to invoke AssignGroupFunction
+      CognitoLambdaInvokePermission:
+        Type: AWS::Lambda::Permission
+        Properties:
+          Action: lambda:InvokeFunction
+          FunctionName: !Ref AssignGroupFunction
+          Principal: cognito-idp.amazonaws.com
+          SourceArn: !GetAtt CognitoUsers.Arn
+       
+        
+      # 3a. Cognito App Client: OAuth2 client for the frontend to authenticate users via the hosted login UI
+      #     Uses Authorization Code flow (no client secret) with openid/email/profile scopes
+      CognitoAppClient:
+        Type: AWS::Cognito::UserPoolClient
+        Properties:
+          ClientName: !Sub "${Prefix}-${ProjectId}-${StageId}-AppClient"
+          UserPoolId: !Ref CognitoUsers
+          GenerateSecret: false
+          AllowedOAuthFlowsUserPoolClient: true
+          AllowedOAuthFlows:
+            - code
+          AllowedOAuthScopes:
+            - openid
+            - email
+            - profile
+          SupportedIdentityProviders:
+            - COGNITO
+          CallbackURLs:
+            - !If [IsDevelopment, 'http://localhost:3000/callback', !Sub "${Domain}/callback"]
+          LogoutURLs:
+            - !If [IsDevelopment, 'http://localhost:3000/', !Sub "${Domain}/"]
+     
+    # 3b. Cognito Hosted UI Domain (Classic):
+    #     provides a managed login/logout UI at <Prefix>-<ProjectId>.auth.<region>.amazoncognito.com
+    CognitoUserPoolDomain:
+        Type: AWS::Cognito::UserPoolDomain
+        Properties:
+          Domain: !Sub "${Prefix}-${ProjectId}"
+          UserPoolId: !Ref CognitoUsers
+          ManagedLoginVersion: 1
+            
+    #Rest of the code down here vvv (dont copy this or anything below this point)
+    # ---------------------------------------------------------------------------
+    # API Gateway Resources
+    
+    # -- API Gateway --
+    #WebApi:
+    #    .........
 ```
 
 **Please Note:**
