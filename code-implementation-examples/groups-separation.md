@@ -21,7 +21,6 @@ Use one User Pool for everyone, but sort users into **Cognito Groups**.
 In `application-infrastructure/template.yml` , under `Resources:` add the following code:
 ```yaml
 Resources:
-Resources:
 	# ---------------------------------------------------------------------------
 	# Separation of Groups
 	
