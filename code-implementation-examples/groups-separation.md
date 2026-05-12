@@ -208,10 +208,12 @@ Resources:
 	#	.........
 ```
 
-Note:
+**Please Note:**
 - There is a limit to the number of groups that can exist in a user pool. Refer [AWS Quota Documentation](https://docs.aws.amazon.com/cognito/latest/developerguide/quotas.html).
 - Refer to the official [Cognito User Groups](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-user-groups.html) documentation to see generalized information related to User Groups.
 - To assign users to these groups. You can do this manually in the AWS Console, or **automatically** by checking an external "Admin List" (like a DynamoDB table) during sign-up.
+- **Your project must have the correct ARN permissions to access Cognito in order to deploy. Please contact a supervisor for access.**
+- When deploying, if the build stage fails, ensure all the spacing in `template.yml` is properly formatted.
 - This architecture assigns the "Admins" group only if the user's email exists in a specific DynamoDB table. Everyone else gets "GeneralUsers".
   - prath's note: if I were making this lambda function, I'd have the logic in an actual .js file with a lambda handler. But this also seems like a valid approach i really don't know would have to confirm
 
