@@ -122,7 +122,7 @@ Resources:
 	    Type: AWS::Lambda::Function
 	    Properties:
 	      FunctionName: !Sub '${Prefix}-${ProjectId}-${StageId}-AssignGroupFunction'
-	      Runtime: nodejs20.x
+	      Runtime: nodejs24.x
 	      Handler: index.handler
 	      Role: !GetAtt LambdaExecutionRole.Arn
 	      Environment:
