@@ -22,7 +22,7 @@ Metadata:
         Parameters:
           #... 
           # ADD THIS ONE VVV
-          - Domain # May need to refactor
+          - Domain # (may need to refactor in the future)
 ```
 
 **Add Domain in Parameters**
