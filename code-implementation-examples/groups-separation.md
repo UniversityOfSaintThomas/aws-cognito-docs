@@ -37,7 +37,7 @@ Parameters:
     Type: String
     Description: "Custom domain name to primarily use for the CallbackURLs. If you leave this blank, a default localhost domain will be used."
     Default: "http://localhost:3000"
-    AllowedPattern: "^$|^https?://[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*(:[0-9]{1,5})?(/.*)?$"
+    AllowedPattern: "^$|^https?://[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*(:[0-9]{1,5})?(/.*)?$"
     ConstraintDescription: "A valid URL (http/https) or empty string"
 ```
 
