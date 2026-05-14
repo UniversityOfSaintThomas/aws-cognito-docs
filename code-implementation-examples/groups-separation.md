@@ -8,7 +8,7 @@ Use one User Pool for everyone, but sort users into **Cognito Groups**.
 
 #### Template.yml
 
-**Add Domain in Application Parameters**
+**Add CallbackDomain in Application Parameters**
 
 In `application-infrastructure/template.yml` , under `Metadata:`> ... > `Label:`> `default: "Application Parameters"` add the following parameter:
 ```yaml
@@ -22,10 +22,14 @@ Metadata:
         Parameters:
           #... 
           # ADD THIS ONE VVV
-          - Domain # (may need to refactor in the future)
+          - CallbackDomain # (may need to refactor in the future)
 ```
 
-**Add Domain in Parameters**
+**Uncomment IsDevelopment**
+In `application-infrastructure/template.yml` , under `Conditions:` uncomment the line:
+`# IsDevelopment: !Equals [!Ref DeployEnvironment, "DEV"]`
+
+**Add CallbackDomain in Parameters**
 
 In `application-infrastructure/template.yml` , under `Parameters:` add the following code:
 
@@ -33,7 +37,7 @@ In `application-infrastructure/template.yml` , under `Parameters:` add the follo
 ```yaml
 Parameters:
   #...
-  Domain:
+  CallbackDomain:
     Type: String
     Description: "Custom domain name to primarily use for the CallbackURLs. If you leave this blank, a default localhost domain will be used."
     Default: "http://localhost:3000"
@@ -222,9 +226,9 @@ In `application-infrastructure/template.yml` , under `Resources:` add the follow
       SupportedIdentityProviders:
         - COGNITO
       CallbackURLs:
-        - !If [IsDevelopment, 'http://localhost:3000/callback', !Sub "${Domain}/callback"]
+        - !If [IsDevelopment, 'http://localhost:3000/callback', !Sub "${CallbackDomain}/callback"]
       LogoutURLs:
-        - !If [IsDevelopment, 'http://localhost:3000/', !Sub "${Domain}/"]
+        - !If [IsDevelopment, 'http://localhost:3000/', !Sub "${CallbackDomain}/"]
 
   # 3b. Cognito Hosted UI Domain (Classic):
   #     provides a managed login/logout UI at <Prefix>-<ProjectId>.auth.<region>.amazoncognito.com
