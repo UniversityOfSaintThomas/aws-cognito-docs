@@ -73,7 +73,7 @@ In `application-infrastructure/template.yml` , under `Resources:` add the follow
 
   # 1b. Define the 'Admins' Group
   AdminGroup:
-   Type: AWS::Cognito::UserPoolGroup
+    Type: AWS::Cognito::UserPoolGroup
    Properties:
      GroupName: "Admins"
      UserPoolId: !Ref CognitoUsers
