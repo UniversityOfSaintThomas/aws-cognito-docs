@@ -29,7 +29,9 @@ Metadata:
 
 In `application-infrastructure/template.yml` , under `Conditions:` uncomment the line:
 
-`# IsDevelopment: !Equals [!Ref DeployEnvironment, "DEV"]`
+```yaml
+  IsDevelopment: !Equals [!Ref DeployEnvironment, "DEV"]
+```
 
 **Add CallbackDomain in Parameters**
 
@@ -241,13 +243,13 @@ In `application-infrastructure/template.yml` , under `Resources:` add the follow
       UserPoolId: !Ref CognitoUsers
       ManagedLoginVersion: 1
 
-    #Rest of the code down here vvv (dont copy this or anything below this point)
-    # ---------------------------------------------------------------------------
-    # API Gateway Resources
-    
-    # -- API Gateway --
-    #WebApi:
-    #    .........
+  #Rest of the code down here vvv (dont copy this or anything below this point)
+  # ---------------------------------------------------------------------------
+  # API Gateway Resources
+
+  # -- API Gateway --
+  #WebApi:
+  #.........
 ```
 
 **Please Note:**
