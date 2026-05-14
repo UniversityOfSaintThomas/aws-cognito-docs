@@ -26,6 +26,7 @@ Metadata:
 ```
 
 **Uncomment IsDevelopment**
+
 In `application-infrastructure/template.yml` , under `Conditions:` uncomment the line:
 `# IsDevelopment: !Equals [!Ref DeployEnvironment, "DEV"]`
 
