@@ -41,6 +41,8 @@ Parameters:
     ConstraintDescription: "A valid URL (http/https) or empty string"
 ```
 
+**Add Code to Resources**
+
 **Table of Contents: Resources (What to add)**
 - **1a.** User Pool and "Post Confirmation" Trigger
 - **1b.** Admins Group
