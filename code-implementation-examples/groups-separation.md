@@ -29,7 +29,7 @@ Metadata:
 
 In `application-infrastructure/template.yml` , under `Parameters:` add the following code:
 
-**NOTE: This `Parameters:` section defines the actual parameter properties. This section is different from the `Metadata` > ... > `Parameters:` section above.**
+**NOTE: This `Parameters:` section defines the actual parameter properties. This section is different from the `Metadata` > ... > `Parameters:` section mentioned above.**
 ```yaml
 Parameters:
   #...
