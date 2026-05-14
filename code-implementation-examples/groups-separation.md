@@ -74,11 +74,11 @@ In `application-infrastructure/template.yml` , under `Resources:` add the follow
   # 1b. Define the 'Admins' Group
   AdminGroup:
     Type: AWS::Cognito::UserPoolGroup
-   Properties:
-     GroupName: "Admins"
-     UserPoolId: !Ref CognitoUsers
-     Description: "University Staff and IT Admins"
-     Precedence: 0 # Higher precedence overrides lower ones if IAM roles conflict
+    Properties:
+      GroupName: "Admins"
+      UserPoolId: !Ref CognitoUsers
+      Description: "University Staff and IT Admins"
+      Precedence: 0 # Higher precedence overrides lower ones if IAM roles conflict
 
   # 1c. Define the 'GeneralUsers' Group
   GeneralGroup:
