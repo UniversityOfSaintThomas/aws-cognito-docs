@@ -88,7 +88,7 @@ Resources:
          UserPoolId: !Ref CognitoUsers
          Description: "Standard Student Access"
 
-    # 1d. Define the more groups as needed (This Documentation will only use Admin and GeneralUsers)
+    # 1d. Define more groups as needed (This Documentation will only use Admin and GeneralUsers)
     
     # 2a. DynamoDB Table storing the list of Admin emails
   AdminWhitelistTable:
