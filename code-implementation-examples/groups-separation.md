@@ -97,16 +97,16 @@ In `application-infrastructure/template.yml` , under `Resources:` add the follow
       TableName: !Sub "${Prefix}-${ProjectId}-${StageId}-AdminWhitelist"
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-      - AttributeName: "email"
-        AttributeType: "S"
+        - AttributeName: "email"
+          AttributeType: "S"
       KeySchema:
-      - AttributeName: "email"
-        KeyType: "HASH"
+        - AttributeName: "email"
+          KeyType: "HASH"
       PointInTimeRecoverySpecification:
-      PointInTimeRecoveryEnabled: true
+        PointInTimeRecoveryEnabled: true
       TimeToLiveSpecification:
-      AttributeName: "ttl"
-      Enabled: true
+        AttributeName: "ttl"
+        Enabled: true
 
   # 2b. Permissions for Lambda to Read DB and Update Cognito
   LambdaExecutionRole:
@@ -205,7 +205,7 @@ In `application-infrastructure/template.yml` , under `Resources:` add the follow
       SourceArn: !GetAtt CognitoUsers.Arn
 
   # 3a. Cognito App Client: OAuth2 client for the frontend to authenticate users via the hosted login UI
-  #   Uses Authorization Code flow (no client secret) with openid/email/profile scopes
+  #     Uses Authorization Code flow (no client secret) with openid/email/profile scopes
   CognitoAppClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
@@ -227,7 +227,7 @@ In `application-infrastructure/template.yml` , under `Resources:` add the follow
         - !If [IsDevelopment, 'http://localhost:3000/', !Sub "${Domain}/"]
 
   # 3b. Cognito Hosted UI Domain (Classic):
-  #   provides a managed login/logout UI at <Prefix>-<ProjectId>.auth.<region>.amazoncognito.com
+  #     provides a managed login/logout UI at <Prefix>-<ProjectId>.auth.<region>.amazoncognito.com
   CognitoUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties:
